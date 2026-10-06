@@ -14,10 +14,6 @@ __pycache__/
 .coverage
 htmlcov/
 
-# Environment variables (keep secrets out of git)
-.env
-backend/.env
-
 # Local database files
 *.db
 *.sqlite
@@ -31,6 +27,25 @@ backend/data/vector_store/
 chroma_db/
 backend/chroma_db/
 
-# OS generated files
+# Node / Frontend
+node_modules
+dist
+dist-ssr
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+backend/.env
+!*.env.example
+
+# Editor and OS files
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
 Thumbs.db
