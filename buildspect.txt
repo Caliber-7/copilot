@@ -1,0 +1,1222 @@
+# Mission Operations Copilot — Frontend Build Specification
+
+## 1. ROLE
+
+You are building the **frontend only** for a Mission Operations Copilot application.
+
+This is a hackathon/demo application for spacecraft mission anomaly investigation.
+
+The frontend must feel like a professional **mission operations workstation**, not a generic chatbot.
+
+The backend/RAG/AI/database will be implemented separately by another developer.
+
+Do NOT implement the backend, database, embeddings, vector search, RAG pipeline, or LLM reasoning.
+
+Your responsibility is:
+
+- Frontend UI
+- Navigation
+- Dashboard
+- Anomaly Center
+- Investigation Workspace
+- Evidence Explorer
+- Telemetry visualizations
+- Incident Timeline
+- Audit Trail
+- Loading/error/empty states
+- Responsive layout
+- API integration layer
+- Mock data for development before backend integration
+
+---
+
+# 2. TECH STACK
+
+Use:
+
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- Recharts
+- Lucide React icons
+
+Do not introduce unnecessary UI frameworks.
+
+Use reusable React components.
+
+Keep the code modular and easy for another developer to connect to a FastAPI backend.
+
+---
+
+# 3. VISUAL DIRECTION
+
+Design language:
+
+**Mission control / aerospace operations workstation**
+
+The interface should feel:
+
+- Professional
+- Technical
+- Dense but readable
+- Data-oriented
+- Trustworthy
+- Modern
+- Dark-mode first
+- Suitable for a live judge/demo presentation
+
+Avoid:
+
+- Generic SaaS dashboards
+- Excessive gradients
+- Huge rounded cards
+- Cartoonish graphics
+- Excessive animations
+- ChatGPT-like chat UI as the primary interface
+- Decorative elements that don't communicate mission information
+
+Use a dark interface with strong hierarchy.
+
+Suggested visual hierarchy:
+
+- Background: very dark navy/charcoal
+- Panels: slightly lighter dark surfaces
+- Borders: subtle
+- Primary text: white/light gray
+- Secondary text: muted gray
+- Status colors:
+  - Green = nominal
+  - Yellow/amber = warning
+  - Red = critical
+  - Blue/cyan = informational/data
+  - Purple = AI/inference where useful
+
+Use status colors consistently.
+
+---
+
+# 4. APPLICATION STRUCTURE
+
+Create this application structure:
+
+src/
+
+```text
+src/
+├── components/
+│   ├── layout/
+│   │   ├── AppShell.tsx
+│   │   ├── Sidebar.tsx
+│   │   ├── Topbar.tsx
+│   │   └── PageHeader.tsx
+│   │
+│   ├── dashboard/
+│   │   ├── MissionStatus.tsx
+│   │   ├── SubsystemCard.tsx
+│   │   ├── ActiveAnomalyCard.tsx
+│   │   └── MissionOverview.tsx
+│   │
+│   ├── anomalies/
+│   │   ├── AnomalyTable.tsx
+│   │   ├── AnomalyCard.tsx
+│   │   ├── AnomalyFilters.tsx
+│   │   └── SeverityBadge.tsx
+│   │
+│   ├── investigation/
+│   │   ├── InvestigationHeader.tsx
+│   │   ├── ObservedFacts.tsx
+│   │   ├── EvidenceList.tsx
+│   │   ├── EvidenceCard.tsx
+│   │   ├── PossibleCauses.tsx
+│   │   ├── DiagnosticSteps.tsx
+│   │   ├── ConfidenceIndicator.tsx
+│   │   └── InvestigationSummary.tsx
+│   │
+│   ├── telemetry/
+│   │   ├── TelemetryChart.tsx
+│   │   ├── TelemetryPanel.tsx
+│   │   └── ChartLegend.tsx
+│   │
+│   ├── timeline/
+│   │   ├── IncidentTimeline.tsx
+│   │   └── TimelineEvent.tsx
+│   │
+│   ├── evidence/
+│   │   ├── EvidenceExplorer.tsx
+│   │   └── EvidenceDetails.tsx
+│   │
+│   └── audit/
+│       ├── AuditTrail.tsx
+│       └── AuditEvent.tsx
+│
+├── pages/
+│   ├── Dashboard.tsx
+│   ├── Anomalies.tsx
+│   ├── Investigation.tsx
+│   ├── Evidence.tsx
+│   ├── Telemetry.tsx
+│   ├── Timeline.tsx
+│   └── Audit.tsx
+│
+├── services/
+│   └── api.ts
+│
+├── data/
+│   └── mockData.ts
+│
+├── types/
+│   └── mission.ts
+│
+├── App.tsx
+└── main.tsx
+```
+
+---
+
+# 5. GLOBAL APP LAYOUT
+
+Create a persistent application shell.
+
+Desktop layout:
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│ TOPBAR                                                      │
+├──────────────┬──────────────────────────────────────────────┤
+│              │                                              │
+│   SIDEBAR    │                 MAIN CONTENT                 │
+│              │                                              │
+│ Dashboard    │                                              │
+│ Anomalies    │                                              │
+│ Investigation│                                              │
+│ Evidence     │                                              │
+│ Telemetry    │                                              │
+│ Timeline     │                                              │
+│ Audit Trail  │                                              │
+│              │                                              │
+└──────────────┴──────────────────────────────────────────────┘
+```
+
+Sidebar should contain:
+
+- Mission Copilot logo/name
+- Dashboard
+- Anomaly Center
+- Investigation
+- Evidence Explorer
+- Telemetry
+- Timeline
+- Audit Trail
+
+Highlight the active route.
+
+---
+
+# 6. TOP BAR
+
+Topbar should contain:
+
+Left:
+
+```text
+MISSION OPERATIONS COPILOT
+SC-01
+```
+
+Center/right:
+
+```text
+MISSION TIME  14:35:21
+```
+
+Status:
+
+```text
+● SYSTEM NOMINAL
+```
+
+And optionally:
+
+- Search
+- Notifications
+- Operator indicator
+
+Keep it compact.
+
+---
+
+# 7. ROUTES
+
+Implement these routes:
+
+```text
+/
+              → Dashboard
+
+/anomalies
+              → Anomaly Center
+
+/investigation/:id
+              → Investigation Workspace
+
+/evidence/:id
+              → Evidence Explorer
+
+/telemetry
+              → Telemetry
+
+/timeline/:id
+              → Incident Timeline
+
+/audit/:id
+              → Audit Trail
+```
+
+Clicking an anomaly should navigate to:
+
+```text
+/investigation/ANOM-004
+```
+
+Clicking an evidence item should navigate to:
+
+```text
+/evidence/TEL-4821
+```
+
+---
+
+# 8. DASHBOARD
+
+Build a mission overview dashboard.
+
+Header:
+
+```text
+MISSION OPERATIONS
+SC-01
+```
+
+Show overall spacecraft status:
+
+```text
+● NOMINAL
+```
+
+Create subsystem cards for:
+
+- POWER
+- THERMAL
+- COMMUNICATION
+- ATTITUDE
+
+Each card should show:
+
+- Status
+- Latest value
+- Short trend
+- Last update
+- Status indicator
+
+Example:
+
+```text
+POWER
+● NOMINAL
+
+Battery Current
+14.2 A
+
+Battery Voltage
+28.4 V
+
+Updated
+14:34:52
+```
+
+Thermal example:
+
+```text
+THERMAL
+● WARNING
+
+Battery Temperature
+43.0 °C
+
+Trend
+↑ +8 °C
+
+Updated
+14:34:50
+```
+
+---
+
+# 9. ACTIVE ANOMALIES
+
+Dashboard must show active anomalies.
+
+Example:
+
+```text
+ACTIVE ANOMALIES
+
+ANOM-004
+Battery Thermal Anomaly
+POWER
+WARNING
+14:32
+
+[INVESTIGATE →]
+```
+
+Clicking it navigates to the Investigation Workspace.
+
+---
+
+# 10. ANOMALY CENTER
+
+Create a dedicated anomaly page.
+
+Header:
+
+```text
+ANOMALY CENTER
+
+12 anomalies detected
+```
+
+Provide:
+
+- Search
+- Severity filter
+- Subsystem filter
+- Status filter
+- Time filter if practical
+
+Severity options:
+
+```text
+All
+Critical
+Warning
+Info
+```
+
+Subsystem options:
+
+```text
+All
+Power
+Thermal
+Communication
+Attitude
+```
+
+Display anomalies as a table or dense cards.
+
+Recommended table:
+
+```text
+ID          TITLE                    SUBSYSTEM   SEVERITY   TIME
+ANOM-004    Battery Thermal         POWER       WARNING    14:32
+ANOM-003    Communication Delay      COMM        INFO       14:18
+ANOM-002    Voltage Deviation        POWER       WARNING    13:52
+```
+
+Each row must be clickable.
+
+---
+
+# 11. INVESTIGATION WORKSPACE — PRIMARY SCREEN
+
+This is the most important frontend screen.
+
+The screen must immediately communicate:
+
+1. What happened
+2. What evidence supports it
+3. What the system thinks may be happening
+4. What the operator should investigate next
+5. How confident the system is
+
+Header:
+
+```text
+← Back to Anomalies
+
+BATTERY THERMAL ANOMALY
+ANOM-004
+
+POWER
+WARNING
+14:32
+```
+
+Add a status badge:
+
+```text
+● INVESTIGATING
+```
+
+---
+
+# 12. OBSERVED FACTS
+
+Create an Observed Facts panel.
+
+Example:
+
+```text
+OBSERVED FACTS
+
+Battery current
+18.7 A
+↑ Above expected range
+
+Battery temperature
+43 °C
+↑ +8 °C from baseline
+
+FDIR
+Warning detected
+
+Communication
+Short delay detected
+```
+
+Important:
+
+Observed facts must visually differ from AI interpretation.
+
+Do not label inferred information as fact.
+
+---
+
+# 13. EVIDENCE PANEL
+
+Create an evidence panel.
+
+Example:
+
+```text
+EVIDENCE
+
+TEL-4821
+Telemetry
+Battery Current
+18.7 A
+14:32:15
+
+[OPEN]
+
+TEL-4830
+Telemetry
+Battery Temperature
+43 °C
+14:32:21
+
+[OPEN]
+
+LOG-223
+Mission Log
+FDIR warning
+14:32:24
+
+[OPEN]
+
+PWR-204
+Power Record
+Load increase
+14:31:58
+
+[OPEN]
+```
+
+Each evidence item must be clickable.
+
+Clicking OPEN navigates to the Evidence Explorer.
+
+---
+
+# 14. POSSIBLE EXPLANATION
+
+Create a separate panel for AI-generated interpretation.
+
+Title:
+
+```text
+POSSIBLE EXPLANATION
+```
+
+Example:
+
+```text
+Elevated power consumption may be
+contributing to the observed battery
+temperature increase.
+```
+
+Clearly mark this as:
+
+```text
+AI ANALYSIS
+```
+
+Do not visually present it as a confirmed fact.
+
+---
+
+# 15. CONFIDENCE
+
+Show:
+
+```text
+CONFIDENCE
+
+82%
+
+High
+```
+
+Use a compact visual indicator.
+
+The component should support:
+
+- percentage
+- label
+- optional explanation
+
+Example:
+
+```text
+82%
+HIGH CONFIDENCE
+```
+
+---
+
+# 16. DIAGNOSTIC STEPS
+
+Create:
+
+```text
+RECOMMENDED DIAGNOSTIC STEPS
+
+01
+Check current battery load
+
+02
+Compare current against expected
+operating envelope
+
+03
+Review recent thermal trend
+
+04
+Check related power subsystem events
+```
+
+These are recommendations only.
+
+Do not create controls that execute spacecraft commands.
+
+---
+
+# 17. SAFETY BOUNDARY
+
+The frontend must make it clear that this is an investigation/support system.
+
+Never add:
+
+- Send command
+- Execute maneuver
+- Change spacecraft configuration
+- Reset spacecraft
+- Upload command
+- Control hardware
+
+If useful, show a small footer/status indicator:
+
+```text
+SIMULATION ENVIRONMENT
+NO SPACECRAFT COMMAND EXECUTION
+```
+
+---
+
+# 18. TELEMETRY VISUALIZATION
+
+Use Recharts.
+
+Create a telemetry section on the Investigation Workspace.
+
+At minimum show:
+
+### Battery Current
+
+- X axis = time
+- Y axis = amperes
+- Highlight anomalous region
+- Show current value
+
+### Battery Temperature
+
+- X axis = time
+- Y axis = temperature
+- Highlight anomalous region
+
+### Optional
+
+- Voltage
+- Power/load
+- Communication latency
+
+Charts must have:
+
+- Axis labels
+- Tooltip
+- Legend
+- Time labels
+- Clear units
+
+Example:
+
+```text
+BATTERY CURRENT
+
+20A ┤                         ●
+18A ┤                    ●────
+16A ┤               ●────
+14A ┤──────●────────
+12A ┤
+   └────────────────────────────
+     14:20  14:25  14:30  14:35
+```
+
+---
+
+# 19. INCIDENT TIMELINE
+
+Create a visual timeline.
+
+Example:
+
+```text
+INCIDENT TIMELINE
+
+14:30
+● Battery current increased
+│
+14:31
+● Power load increased
+│
+14:32
+● Battery temperature increased
+│
+14:32
+● FDIR warning detected
+│
+14:33
+● Communication delay detected
+```
+
+Each event should contain:
+
+- Timestamp
+- Description
+- Source
+- Severity/type
+
+Allow clicking an event to inspect its evidence where practical.
+
+---
+
+# 20. EVIDENCE EXPLORER
+
+Create a dedicated evidence detail page.
+
+Example:
+
+```text
+EVIDENCE EXPLORER
+
+TEL-4821
+
+SOURCE
+Telemetry
+
+TIMESTAMP
+14:32:15
+
+SUBSYSTEM
+POWER
+
+PARAMETER
+Battery Current
+
+VALUE
+18.7 A
+
+EXPECTED RANGE
+10–15 A
+```
+
+Include:
+
+```text
+ORIGINAL RECORD
+```
+
+with a formatted raw-record view.
+
+Also show related evidence:
+
+```text
+RELATED EVIDENCE
+
+TEL-4830
+LOG-223
+PWR-204
+```
+
+---
+
+# 21. AUDIT TRAIL
+
+Create an audit trail page.
+
+Example:
+
+```text
+AUDIT TRAIL
+
+14:42:10
+Operator opened ANOM-004
+
+14:42:14
+Investigation started
+
+14:42:15
+Evidence TEL-4821 retrieved
+
+14:42:16
+Evidence PWR-204 retrieved
+
+14:42:19
+Investigation generated
+
+14:42:21
+Recommendation displayed
+```
+
+Each audit event should have:
+
+- Timestamp
+- Event type
+- Description
+- Actor/system
+
+Use visual distinction between:
+
+```text
+OPERATOR
+SYSTEM
+AI
+```
+
+---
+
+# 22. MOCK DATA
+
+Before the backend is available, create realistic mock data.
+
+Use the following example anomaly:
+
+```typescript
+{
+  id: "ANOM-004",
+  title: "Battery Thermal Anomaly",
+  subsystem: "POWER",
+  severity: "WARNING",
+  status: "INVESTIGATING",
+  timestamp: "14:32:00"
+}
+```
+
+Mock evidence:
+
+```typescript
+[
+  {
+    id: "TEL-4821",
+    source: "Telemetry",
+    subsystem: "POWER",
+    parameter: "Battery Current",
+    value: "18.7 A",
+    timestamp: "14:32:15"
+  },
+  {
+    id: "TEL-4830",
+    source: "Telemetry",
+    subsystem: "THERMAL",
+    parameter: "Battery Temperature",
+    value: "43 °C",
+    timestamp: "14:32:21"
+  },
+  {
+    id: "LOG-223",
+    source: "Mission Log",
+    subsystem: "POWER",
+    parameter: "FDIR Warning",
+    value: "Battery thermal threshold warning",
+    timestamp: "14:32:24"
+  }
+]
+```
+
+Mock telemetry should contain a believable time series around the anomaly.
+
+---
+
+# 23. TYPES
+
+Create reusable TypeScript types.
+
+At minimum:
+
+```typescript
+type Severity = "CRITICAL" | "WARNING" | "INFO";
+
+type AnomalyStatus =
+  | "OPEN"
+  | "INVESTIGATING"
+  | "RESOLVED";
+
+interface Anomaly {
+  id: string;
+  title: string;
+  subsystem: string;
+  severity: Severity;
+  status: AnomalyStatus;
+  timestamp: string;
+}
+
+interface Evidence {
+  id: string;
+  source: string;
+  subsystem: string;
+  parameter: string;
+  value: string;
+  timestamp: string;
+}
+
+interface TelemetryPoint {
+  timestamp: string;
+  value: number;
+}
+
+interface TimelineEvent {
+  timestamp: string;
+  description: string;
+  source?: string;
+  severity?: Severity;
+}
+
+interface AuditEvent {
+  timestamp: string;
+  actor: "OPERATOR" | "SYSTEM" | "AI";
+  description: string;
+}
+```
+
+---
+
+# 24. API SERVICE LAYER
+
+Create:
+
+```text
+src/services/api.ts
+```
+
+Do not make API requests directly inside every component.
+
+Create functions such as:
+
+```typescript
+getAnomalies()
+
+getAnomaly(id)
+
+getEvidence(id)
+
+getTelemetry()
+
+getTimeline(id)
+
+getAuditTrail(id)
+
+getInvestigation(id)
+
+submitCopilotQuery(...)
+```
+
+Initially these can return mock data.
+
+Later replace the implementation with FastAPI requests.
+
+Expected backend endpoints are approximately:
+
+```text
+GET  /api/anomalies
+GET  /api/anomalies/{id}
+GET  /api/evidence/{id}
+GET  /api/telemetry
+POST /api/investigations
+POST /api/copilot/query
+GET  /api/timeline/{incident_id}
+GET  /api/audit/{incident_id}
+```
+
+Keep the frontend architecture independent of whether data comes from mock data or the real API.
+
+---
+
+# 25. LOADING STATES
+
+Every data-driven page must have a loading state.
+
+Example:
+
+```text
+Loading investigation...
+```
+
+Use skeletons where appropriate.
+
+Avoid blank screens.
+
+---
+
+# 26. ERROR STATES
+
+If an API fails:
+
+```text
+Unable to load investigation.
+
+The mission data service could not be reached.
+
+[Retry]
+```
+
+Do not expose raw stack traces to the user.
+
+---
+
+# 27. EMPTY STATES
+
+Example:
+
+```text
+NO ACTIVE ANOMALIES
+
+All monitored subsystems are currently
+within expected operating conditions.
+```
+
+---
+
+# 28. RESPONSIVENESS
+
+Primary target:
+
+**Desktop / laptop**
+
+The hackathon demo will primarily be shown on a large screen.
+
+Still make the layout usable at:
+
+- 1440px
+- 1280px
+- 1024px
+
+Do not prioritize mobile over desktop.
+
+---
+
+# 29. COMPONENT PRINCIPLES
+
+Components should be:
+
+- Reusable
+- Small
+- Typed
+- Easy to modify
+- Independent from API implementation
+
+Avoid putting huge amounts of JSX into App.tsx.
+
+---
+
+# 30. IMPORTANT UX RULES
+
+The operator should never have to guess:
+
+- What anomaly is active?
+- How severe is it?
+- What subsystem is involved?
+- What evidence supports it?
+- What is fact vs inference?
+- What should be investigated next?
+- How confident is the system?
+
+These should be visually obvious.
+
+---
+
+# 31. DEMO FLOW
+
+The frontend must support this complete demo:
+
+```text
+Dashboard
+   ↓
+Active Anomaly
+   ↓
+ANOM-004
+   ↓
+Investigation Workspace
+   ↓
+Observed Facts
+   ↓
+Telemetry Chart
+   ↓
+Evidence
+   ↓
+Possible Explanation
+   ↓
+Confidence
+   ↓
+Diagnostic Steps
+   ↓
+Timeline
+   ↓
+Audit Trail
+```
+
+This should be possible without manually entering IDs or URLs.
+
+---
+
+# 32. JUDGE EXPERIENCE
+
+Optimize the frontend around one core story:
+
+> "The system detects an anomaly, shows the underlying evidence, correlates telemetry and mission events, presents an AI-assisted explanation, and gives the operator traceable diagnostic next steps."
+
+The Investigation Workspace is the centerpiece.
+
+The Dashboard is the entry point.
+
+The Evidence Explorer proves traceability.
+
+The Timeline proves temporal correlation.
+
+The Audit Trail proves investigation history.
+
+---
+
+# 33. DEVELOPMENT ORDER
+
+Build in this exact order:
+
+### Phase 1
+Project setup
+
+### Phase 2
+App shell + navigation
+
+### Phase 3
+Dashboard
+
+### Phase 4
+Anomaly Center
+
+### Phase 5
+Investigation Workspace
+
+### Phase 6
+Evidence Explorer
+
+### Phase 7
+Telemetry charts
+
+### Phase 8
+Timeline
+
+### Phase 9
+Audit Trail
+
+### Phase 10
+Mock API service
+
+### Phase 11
+Connect real FastAPI backend
+
+### Phase 12
+Polish + bug fixing
+
+---
+
+# 34. ACCEPTANCE CRITERIA
+
+The frontend is complete when:
+
+- [ ] Application starts with Vite
+- [ ] Sidebar navigation works
+- [ ] Dashboard displays spacecraft status
+- [ ] Subsystem status cards work
+- [ ] Active anomalies are visible
+- [ ] Anomaly Center supports filtering
+- [ ] Clicking an anomaly opens Investigation Workspace
+- [ ] Investigation shows observed facts
+- [ ] Investigation shows evidence
+- [ ] Evidence items are clickable
+- [ ] Investigation shows possible explanation
+- [ ] Confidence is displayed
+- [ ] Diagnostic steps are displayed
+- [ ] Telemetry charts render
+- [ ] Timeline renders
+- [ ] Evidence Explorer works
+- [ ] Audit Trail works
+- [ ] Loading states exist
+- [ ] Error states exist
+- [ ] Mock data works without backend
+- [ ] API service layer exists
+- [ ] Real API integration can be added without rewriting components
+- [ ] No spacecraft control functionality exists
+- [ ] UI clearly indicates simulation environment
+- [ ] Full demo flow works from Dashboard → Investigation → Evidence → Timeline → Audit
+
+---
+
+# 35. FINAL IMPLEMENTATION INSTRUCTION
+
+Build the application now.
+
+Do not ask for backend implementation.
+
+Use realistic mock data so the frontend is immediately runnable.
+
+Prioritize the **Investigation Workspace** over secondary pages.
+
+Make the interface polished enough for a hackathon judge demonstration.
+
+Do not over-engineer.
+
+Do not add features that are not required.
+
+The final result should look like a professional spacecraft mission investigation console rather than a generic admin dashboard.

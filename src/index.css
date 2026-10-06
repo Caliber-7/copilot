@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#060b13] text-slate-200 antialiased font-sans selection:bg-sky-500 selection:text-white;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Custom scrollbar for mission operations console */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #080f1a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1e2c48;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2a4473;
+  }
+}
+
+@layer components {
+  .mission-card {
+    @apply bg-[#0c1524] border border-[#1a2842] rounded-lg shadow-lg;
+  }
+  
+  .mission-card-hover {
+    @apply transition-all duration-200 hover:border-[#2a4473] hover:shadow-cyan-950/20;
+  }
+
+  .mission-glass {
+    @apply bg-[#0c1524]/85 backdrop-blur-md border border-[#1a2842];
+  }
+
+  .badge-tag {
+    @apply px-2 py-0.5 text-xs font-mono rounded font-semibold uppercase tracking-wider inline-flex items-center gap-1.5;
+  }
+}
+
+/* Subtle tech grid background */
+.tech-grid-bg {
+  background-image: radial-gradient(rgba(30, 58, 95, 0.15) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Pulse animation for live indicators */
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
