@@ -20,11 +20,22 @@ class Settings(BaseSettings):
     CHROMA_COLLECTION_NAME: str = "mission_knowledge_base"
 
     # AI / LLM Configuration
-    LLM_PROVIDER: str = "mock"
+    # Supported providers: 'ollama', 'gemini', 'openai', 'anthropic', 'mock'
+    LLM_PROVIDER: str = "ollama"
     LLM_API_KEY: Optional[str] = None
-    LLM_MODEL: str = "gpt-4o"
+    LLM_MODEL: str = "llama3"
     LLM_API_BASE: Optional[str] = None
     LLM_TEMPERATURE: float = 0.2
+    LLM_FALLBACK_TO_MOCK: bool = True
+
+    # Google Gemini Configuration
+    GEMINI_API_KEY: Optional[str] = None
+    GEMINI_MODEL: str = "gemini-1.5-flash"
+    GEMINI_API_BASE: str = "https://generativelanguage.googleapis.com/v1beta/openai"
+
+    # Ollama Local Configuration
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    OLLAMA_MODEL: str = "llama3"
 
     # Spacecraft & Simulation Guardrails
     SIMULATION_MODE: bool = True

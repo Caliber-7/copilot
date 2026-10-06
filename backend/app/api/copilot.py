@@ -10,16 +10,18 @@ from app.models.evidence import EvidenceItem
 from app.schemas.investigation import CopilotQueryRequest, CopilotQueryResponse
 from app.services.rag import rag_service
 from app.services.audit import audit_service
+from app.services.llm_client import llm_client
 from app.config import settings
 
 router = APIRouter(prefix="/api/copilot", tags=["AI Copilot"])
 
 @router.post("/query", response_model=CopilotQueryResponse)
 @router.post("/chat", response_model=CopilotQueryResponse)
-def query_copilot(payload: CopilotQueryRequest, db: Session = Depends(get_db)):
+async def query_copilot(payload: CopilotQueryRequest, db: Session = Depends(get_db)):
     """
     Interactive AI Copilot chat query endpoint.
     Answers operator questions grounded in retrieved mission evidence and investigation context.
+    Supports Ollama, Google Gemini, and grounded simulation fallback.
     """
     anomaly_id = payload.anomaly_id or "ANOM-004"
     inv = db.query(Investigation).filter(Investigation.anomaly_id == anomaly_id).first()
@@ -27,8 +29,9 @@ def query_copilot(payload: CopilotQueryRequest, db: Session = Depends(get_db)):
     evidence_list = db.query(EvidenceItem).filter(EvidenceItem.anomaly_id == anomaly_id).all()
 
     q_lower = payload.query.lower()
+    answer = None
 
-    # Grounded answer logic matching prompt and image.png
+    # Pre-crafted ground truth answers for high-frequency console chips
     if "why" in q_lower and ("detected" in q_lower or "anomaly" in q_lower):
         answer = (
             "The anomaly was detected due to an increase in battery current (15.8A -> 18.7A) "
@@ -64,15 +67,40 @@ def query_copilot(payload: CopilotQueryRequest, db: Session = Depends(get_db)):
             "• 14:32:15 UTC - FDIR power subsystem fault warning asserted (LOG-224)\n"
             "• 14:32:16 UTC - Telemetry packet transmission delay spiked to 1.2s (TEL-4824)"
         )
-    else:
-        # Default synthesized grounded answer
+
+    # If not a standard chip and an external LLM is configured (Ollama or Gemini)
+    if not answer and settings.LLM_PROVIDER.lower() != "mock":
+        try:
+            system_prompt = (
+                "You are the Mission Operations Copilot AI for spacecraft SC-01. "
+                "Answer the operator's query directly, accurately, and concisely. "
+                "STRICT GROUNDING: Use only the provided spacecraft context. Do not invent ungrounded data. "
+                "Enforce decision-support safety boundaries."
+            )
+            evidence_summary = "\n".join([f"- {e.source_id}: {e.title}" for e in evidence_list[:6]])
+            inv_summary = inv.summary if inv else "No investigation summary available."
+            user_prompt = (
+                f"Spacecraft: SC-01\n"
+                f"Anomaly: {anomaly_id} ({anomaly.title if anomaly else 'Unknown'})\n"
+                f"Investigation Summary: {inv_summary}\n"
+                f"Validated Evidence:\n{evidence_summary}\n\n"
+                f"Operator Question: {payload.query}"
+            )
+            res = await llm_client.generate_response(system_prompt, user_prompt, json_mode=False)
+            if res and "text" in res:
+                answer = res["text"]
+        except Exception as e:
+            print(f"[CopilotAPI] Live LLM query exception: {e}. Falling back to grounded answer.")
+
+    # Fallback grounded synthesis
+    if not answer:
         summary_text = inv.summary if inv else "Battery current surge preceded temperature elevation."
         answer = (
             f"Based on mission evidence for {anomaly_id}: {summary_text} "
             f"Root cause analysis indicates unexpected electrical bus load rather than intrinsic cell degradation."
         )
 
-    # Supporting evidence citations
+    # Supporting evidence citations matching image.png Panel 8
     supporting = [
         {"id": "TEL-4821", "description": "Battery current: 18.7A (expected 15-17A)", "type": "telemetry"},
         {"id": "TEL-4830", "description": "Battery temperature +8°C (reached 38.2°C)", "type": "telemetry"},
@@ -96,7 +124,7 @@ def query_copilot(payload: CopilotQueryRequest, db: Session = Depends(get_db)):
         action="Copilot query answered",
         object_id=anomaly_id,
         evidence_ref=f"{len(supporting)} sources",
-        details={"query": payload.query, "confidence": confidence}
+        details={"query": payload.query, "confidence": confidence, "provider": settings.LLM_PROVIDER}
     )
 
     return CopilotQueryResponse(
@@ -108,8 +136,8 @@ def query_copilot(payload: CopilotQueryRequest, db: Session = Depends(get_db)):
         suggested_actions=suggested_actions,
         llm_metadata={
             "provider": settings.LLM_PROVIDER,
-            "model": settings.LLM_MODEL,
+            "model": settings.OLLAMA_MODEL if settings.LLM_PROVIDER == "ollama" else (settings.GEMINI_MODEL if settings.LLM_PROVIDER == "gemini" else settings.LLM_MODEL),
             "grounded": True,
-            "simulation_mode": True
+            "simulation_mode": settings.SIMULATION_MODE
         }
     )

@@ -258,16 +258,35 @@ class InvestigationService:
         Invokes external LLM if configured; otherwise provides grounded,
         rigorous spacecraft operations analysis adhering strictly to retrieved facts.
         """
-        # If external LLM is configured (e.g. OpenAI or Gemini or Anthropic)
-        if settings.LLM_PROVIDER != "mock" and settings.LLM_API_KEY:
+        # If an LLM provider is active (Ollama, Gemini, OpenAI, etc.)
+        if settings.LLM_PROVIDER.lower() != "mock":
             try:
-                llm_response = await InvestigationService._call_external_llm(
-                    anomaly, evidence_items, correlations, historical_matches, applicable_procedures
+                system_prompt = (
+                    "You are the Mission Operations Copilot AI, an expert aerospace decision-support system. "
+                    "You analyze spacecraft telemetry excursions, flight logs, operating procedures, and historical incidents. "
+                    "STRICT RULES:\n"
+                    "- Ground all hypotheses and conclusions strictly in the provided evidence.\n"
+                    "- Never hallucinate telemetry or procedures not provided.\n"
+                    "- Enforce flight safety boundaries (simulation and decision-support only; no direct commanding).\n"
+                    "- Return valid JSON matching keys: summary, primary_hypothesis, alternative_hypotheses (list), "
+                    "root_cause_analysis, key_findings (dict with observed_facts, inferences, recommendations, evidence, facts), "
+                    "next_steps (list), recommendations (list of dicts with step, action, type, urgency, safety_note), "
+                    "safety_boundaries (list), supporting_evidence (list), timeline_events (list)."
                 )
-                if llm_response:
+                user_payload = {
+                    "spacecraft": anomaly.spacecraft_id,
+                    "anomaly": {"id": anomaly.id, "title": anomaly.title, "subsystem": anomaly.subsystem, "severity": anomaly.severity},
+                    "evidence": [{"id": e.source_id, "type": e.source_type, "title": e.title} for e in evidence_items[:8]],
+                    "correlations": [{"pair": f"{c.param_a} & {c.param_b}", "r": c.correlation_coefficient, "lag": c.time_lag_seconds} for c in correlations[:4]],
+                    "historical_matches": [{"id": h["id"], "title": h["title"], "similarity": h["similarity"]} for h in historical_matches[:3]],
+                    "procedures": [{"id": p["id"], "title": p["title"]} for p in applicable_procedures[:3]]
+                }
+                from app.services.llm_client import llm_client
+                llm_response = await llm_client.generate_response(system_prompt, json.dumps(user_payload), json_mode=True)
+                if llm_response and "summary" in llm_response and "primary_hypothesis" in llm_response:
                     return llm_response
             except Exception as e:
-                print(f"[InvestigationService] External LLM call error: {e}. Falling back to grounded mock engine.")
+                print(f"[InvestigationService] LLM provider '{settings.LLM_PROVIDER}' notice: {e}. Falling back to grounded mock engine.")
 
         # Grounded Analysis Engine matching image.png panels
         observed_facts = [

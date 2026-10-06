@@ -150,10 +150,18 @@ DATABASE_URL=sqlite:///./mission_ops.db
 VECTOR_DB_PATH=./data/vector_store
 CHROMA_COLLECTION_NAME=mission_knowledge_base
 
-# AI / LLM Mode ('mock', 'openai', 'gemini', 'anthropic', 'ollama')
-LLM_PROVIDER=mock
-LLM_API_KEY=
-LLM_MODEL=gpt-4o
+# AI / LLM Provider: 'ollama' or 'gemini' (or 'mock', 'openai', 'anthropic')
+LLM_PROVIDER=ollama
+LLM_TEMPERATURE=0.2
+
+# 1. Ollama (Local Open Source - No API Key Needed)
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=llama3
+# (Run locally with: ollama run llama3)
+
+# 2. Google Gemini (Cloud)
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=gemini-1.5-flash
 
 # Safety & Simulation Guardrails
 SIMULATION_MODE=True
@@ -161,7 +169,7 @@ SPACECRAFT_ID=SC-01
 ALLOW_HARDWARE_COMMANDS=False
 ```
 
-> **Grounded Mock / Demo Mode:** When `LLM_PROVIDER=mock` or `LLM_API_KEY` is not provided, the application runs entirely offline using its deterministic, evidence-grounded aerospace simulation engine.
+> **Resilient Cascade:** If `LLM_PROVIDER=ollama` is selected but your local Ollama daemon is not yet running, or if `LLM_PROVIDER=gemini` is selected without an API key, the system automatically falls back to its deterministic, evidence-grounded aerospace simulation engine without throwing unhandled exceptions.
 
 ---
 
