@@ -1,0 +1,278 @@
+# Mission Operations Copilot — Backend / AI Build Specification
+
+## 1. ROLE
+
+You are building the **backend and AI/RAG layer** for a Mission Operations Copilot.
+
+This backend will be consumed by a separate React frontend built by another developer.
+
+Your responsibility:
+
+- FastAPI backend
+- Database/data models
+- Simulated spacecraft mission data
+- Telemetry data
+- Mission logs
+- Procedures
+- Historical incidents
+- Vector/RAG retrieval
+- Evidence retrieval
+- Evidence validation
+- Telemetry correlation
+- AI investigation generation
+- Confidence calculation
+- Diagnostic recommendations
+- Timeline generation
+- Audit trail
+- API endpoints
+- Safety boundaries
+
+Do NOT build the React frontend.
+
+Do NOT build spacecraft-control functionality.
+
+This is a **simulation and decision-support system only**.
+
+---
+
+# 2. TECH STACK
+
+Use:
+
+- Python 3.11+
+- FastAPI
+- Pydantic
+- PostgreSQL where practical
+- ChromaDB or an equivalent local vector store
+- Sentence-transformers or another local embedding model
+- LLM through a configurable provider/API
+- SQLAlchemy where appropriate
+
+Keep external AI configuration in environment variables.
+
+Example:
+
+```text
+LLM_API_KEY=
+LLM_MODEL=
+DATABASE_URL=
+VECTOR_DB_PATH=
+```
+
+The application must still run in a mock/demo mode if the LLM API is unavailable.
+
+---
+
+# 3. BACKEND STRUCTURE
+
+Use this structure:
+
+```text
+backend/
+│
+├── app/
+│   ├── main.py
+│   │
+│   ├── api/
+│   │   ├── anomalies.py
+│   │   ├── evidence.py
+│   │   ├── telemetry.py
+│   │   ├── investigations.py
+│   │   ├── copilot.py
+│   │   ├── timeline.py
+│   │   └── audit.py
+│   │
+│   ├── models/
+│   │   ├── anomaly.py
+│   │   ├── evidence.py
+│   │   ├── telemetry.py
+│   │   ├── mission_log.py
+│   │   ├── procedure.py
+│   │   ├── incident.py
+│   │   └── audit.py
+│   │
+│   ├── schemas/
+│   │   ├── anomaly.py
+│   │   ├── evidence.py
+│   │   ├── telemetry.py
+│   │   ├── investigation.py
+│   │   └── audit.py
+│   │
+│   ├── services/
+│   │   ├── rag.py
+│   │   ├── retrieval.py
+│   │   ├── evidence_engine.py
+│   │   ├── correlation.py
+│   │   ├── investigation.py
+│   │   ├── confidence.py
+│   │   └── audit.py
+│   │
+│   ├── db/
+│   │   ├── database.py
+│   │   └── seed.py
+│   │
+│   └── config.py
+│
+├── data/
+│   ├── telemetry/
+│   ├── logs/
+│   ├── procedures/
+│   └── incidents/
+│
+├── tests/
+│
+├── requirements.txt
+├── .env.example
+└── README.md
+```
+
+---
+
+# 4. CORE CONCEPT
+
+The backend must implement this pipeline:
+
+```text
+User / Frontend
+      ↓
+FastAPI
+      ↓
+Investigation Request
+      ↓
+Retrieve Relevant Evidence
+      ↓
+Telemetry Correlation
+      ↓
+Historical Incident Retrieval
+      ↓
+Procedure Retrieval
+      ↓
+AI Analysis
+      ↓
+Evidence Validation
+      ↓
+Structured Investigation
+      ↓
+Audit Event
+      ↓
+Frontend
+```
+
+The AI must NOT simply answer from general knowledge.
+
+The investigation should be grounded in retrieved mission evidence.
+
+---
+
+# 5. SIMULATED SPACECRAFT
+
+Create a simulated spacecraft:
+
+```text
+SC-01
+```
+
+Subsystems:
+
+```text
+POWER
+THERMAL
+COMMUNICATION
+ATTITUDE
+```
+
+Generate realistic but fictional mission data.
+
+---
+
+# 6. REQUIRED DATASETS
+
+Create mock datasets for:
+
+### Telemetry
+
+Include parameters such as:
+
+```text
+Battery Current
+Battery Voltage
+Battery Temperature
+Power Load
+Communication Latency
+Attitude Error
+```
+
+Each telemetry record should contain:
+
+```json
+{
+  "id": "TEL-4821",
+  "spacecraft_id": "SC-01",
+  "timestamp": "2026-01-01T14:32:15",
+  "subsystem": "POWER",
+  "parameter": "Battery Current",
+  "value": 18.7,
+  "unit": "A"
+}
+```
+
+---
+
+### Mission Logs
+
+Example:
+
+```json
+{
+  "id": "LOG-223",
+  "timestamp": "2026-01-01T14:32:24",
+  "subsystem": "POWER",
+  "severity": "WARNING",
+  "message": "Battery thermal threshold warning"
+}
+```
+
+---
+
+### Procedures
+
+Create procedural documents such as:
+
+- Battery thermal investigation
+- Power load investigation
+- Communication anomaly investigation
+- Thermal anomaly investigation
+- FDIR warning investigation
+
+These become RAG documents.
+
+---
+
+### Historical Incidents
+
+Create at least 10–20 fictional historical incidents.
+
+Each should contain:
+
+- Incident ID
+- Description
+- Subsystem
+- Symptoms
+- Root cause
+- Evidence
+- Resolution
+- Lessons learned
+
+Example:
+
+```text
+INC-007
+
+Battery temperature increase associated with
+temporary power-load spike.
+
+Root Cause:
+Unexpected subsystem load.
+
+Resolution:
+Load returned

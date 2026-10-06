@@ -1,0 +1,83 @@
+[
+  {
+    "id": "LOG-210",
+    "timestamp": "2026-06-24T14:00:00",
+    "spacecraft_id": "SC-01",
+    "subsystem": "POWER",
+    "severity": "INFO",
+    "message": "Power subsystem baseline check: Main Bus A at 28.4V, Battery SoC 92.4%. All parameters nominal.",
+    "source": "Power Subsystem Controller"
+  },
+  {
+    "id": "LOG-215",
+    "timestamp": "2026-06-24T14:15:30",
+    "spacecraft_id": "SC-01",
+    "subsystem": "THERMAL",
+    "severity": "INFO",
+    "message": "Radiator loop panel temperature nominal at 4.2°C. Thermal margins green across all zones.",
+    "source": "Thermal Control Unit"
+  },
+  {
+    "id": "LOG-220",
+    "timestamp": "2026-06-24T14:30:12",
+    "spacecraft_id": "SC-01",
+    "subsystem": "POWER",
+    "severity": "WARNING",
+    "message": "Battery current increased from 15.8A to 18.7A. Secondary bus load increase detected.",
+    "source": "PDU Monitor"
+  },
+  {
+    "id": "LOG-223",
+    "timestamp": "2026-06-24T14:32:04",
+    "spacecraft_id": "SC-01",
+    "subsystem": "THERMAL",
+    "severity": "WARNING",
+    "message": "Battery thermal threshold warning: Cell pack temperature exceeded 35.0°C threshold (current: 38.2°C).",
+    "source": "Thermal Protection Unit"
+  },
+  {
+    "id": "LOG-224",
+    "timestamp": "2026-06-24T14:32:15",
+    "spacecraft_id": "SC-01",
+    "subsystem": "FDIR",
+    "severity": "WARNING",
+    "message": "FDIR warning - power subsystem: Bus current excursion threshold exceeded. Evaluating fault tree.",
+    "source": "FDIR Engine"
+  },
+  {
+    "id": "LOG-225",
+    "timestamp": "2026-06-24T14:32:16",
+    "spacecraft_id": "SC-01",
+    "subsystem": "COMM",
+    "severity": "WARNING",
+    "message": "Packet transmission delayed by 1.2s. Downlink queue buffer depth elevated due to high burst activity.",
+    "source": "Comms Subsystem"
+  },
+  {
+    "id": "LOG-226",
+    "timestamp": "2026-06-24T14:35:10",
+    "spacecraft_id": "SC-01",
+    "subsystem": "POWER",
+    "severity": "WARNING",
+    "message": "Battery peak temperature plateau reached at 38.8°C. Thermal gradient moderating to +0.1°C/min.",
+    "source": "Power Subsystem Controller"
+  },
+  {
+    "id": "LOG-228",
+    "timestamp": "2026-06-24T14:44:00",
+    "spacecraft_id": "SC-01",
+    "subsystem": "POWER",
+    "severity": "INFO",
+    "message": "Bus current tapering down towards 17.4A. Temperature declining to 36.4°C.",
+    "source": "PDU Monitor"
+  },
+  {
+    "id": "LOG-230",
+    "timestamp": "2026-06-24T14:55:00",
+    "spacecraft_id": "SC-01",
+    "subsystem": "FDIR",
+    "severity": "INFO",
+    "message": "FDIR power subsystem flag de-asserted. System transitioning back to monitored state.",
+    "source": "FDIR Engine"
+  }
+]

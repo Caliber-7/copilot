@@ -1,0 +1,237 @@
+[
+  {
+    "id": "PWR-204",
+    "title": "Battery Thermal Investigation and Mitigation Procedure",
+    "subsystem": "POWER",
+    "category": "INVESTIGATION",
+    "description": "Standard operating procedure to diagnose unexpected battery temperature spikes exceeding nominal upper thermal limit (+30°C to +35°C), determine electrical bus correlation, and initiate thermal mitigation.",
+    "applicable_conditions": [
+      "Battery temperature telemetry exceeds 35°C on either primary or redundant cell pack.",
+      "Battery current exceeds 17.5A during non-eclipse peak operational phases.",
+      "FDIR warning flag FDIR-PWR-001 asserted by flight computer."
+    ],
+    "safety_constraints": [
+      "CRITICAL: Do NOT execute main relay switching while battery cell temperature is above 40°C to avoid thermal runaway.",
+      "CRITICAL: Maintain continuous S-band downlink lock before altering battery charge regulator modes.",
+      "SIMULATION CONSTRAINT: Real spacecraft command uplinks are strictly prohibited in simulation and decision-support mode."
+    ],
+    "steps": [
+      {
+        "step_num": 1,
+        "action": "Query telemetry parameter 'Battery Current' and evaluate bus load distribution across Main Bus A and B.",
+        "expected_response": "Current reading should be between 15.0A and 17.0A. Values above 17.5A indicate unexpected electrical load.",
+        "caution": "Verify shunt regulator status before diagnosing battery internal resistance."
+      },
+      {
+        "step_num": 2,
+        "action": "Check telemetry parameter 'Battery Temperature' gradient over the preceding 15 minutes.",
+        "expected_response": "Temperature slope should not exceed +0.5°C per minute under nominal thermal dissipation.",
+        "caution": "If slope exceeds +1.5°C/min, prepare immediate non-essential payload load-shedding command sequence."
+      },
+      {
+        "step_num": 3,
+        "action": "Cross-reference FDIR logs for autonomous heater activation or stuck thermal loop louvers.",
+        "expected_response": "Heater relays should be in OFF state when cell pack temperature is > 25°C.",
+        "caution": "Confirm heater current draws on telemetry channel HTR-CURR-01."
+      },
+      {
+        "step_num": 4,
+        "action": "Compare telemetry against historical incident INC-102 and INC-007 for load spike signatures.",
+        "expected_response": "Identify matching payload transmitter or reaction wheel spin-up profiles.",
+        "caution": "Do not isolate battery string if single battery configuration is active."
+      },
+      {
+        "step_num": 5,
+        "action": "If elevated current persists for > 10 minutes, recommend operator shed secondary payload instruments (Payload Bus 2).",
+        "expected_response": "Battery current drops below 16.0A within 120 seconds, temperature stabilizes within 10 minutes.",
+        "caution": "Notify mission director prior to payload load shedding."
+      }
+    ],
+    "document_content": "PROCEDURE PWR-204: Battery Thermal Investigation and Mitigation. Subsystem: POWER. Purpose: Diagnose and resolve battery temperature excursions. When battery temperature exceeds nominal threshold (35°C) or current exceeds 17A, verify load distribution on Bus A and Bus B. Check correlation with recent payload activations or transmitter duty cycles. If thermal gradient > 0.5C/min, verify battery heater circuits are unpowered. Cross-reference with INC-102 and INC-007. Operational constraints: Do NOT cycle battery power relay above 40°C. Maintain downlink lock. Simulation advisory: Decision support only."
+  },
+  {
+    "id": "PWR-101",
+    "title": "Power Load Investigation and Bus Balancing Procedure",
+    "subsystem": "POWER",
+    "category": "INVESTIGATION",
+    "description": "Diagnose anomalous high power draw across primary unregulated bus, isolate parasitic electrical loads, and verify solar array drive mechanism power delivery.",
+    "applicable_conditions": [
+      "Total power load exceeds 450W sustained for greater than 180 seconds.",
+      "Bus voltage drops below 26.5V DC.",
+      "Solar array current mismatch between wing +Y and wing -Y exceeds 2.0A."
+    ],
+    "safety_constraints": [
+      "Do NOT power down Attitude and Orbit Control System (AOCS) flight computers.",
+      "Maintain minimum battery State of Charge (SoC) above 65% at all times."
+    ],
+    "steps": [
+      {
+        "step_num": 1,
+        "action": "Inspect power distribution unit (PDU) channel currents for subsystem branches.",
+        "expected_response": "All individual subsystem branches within 10% of predicted power budget.",
+        "caution": "High telemetry latency may cause delayed current readouts."
+      },
+      {
+        "step_num": 2,
+        "action": "Correlate total power load with attitude orientation relative to sun vector.",
+        "expected_response": "Sun tracking angle within 2.5 degrees of perpendicular solar illumination.",
+        "caution": "Check gyro drift if attitude error is flagged."
+      },
+      {
+        "step_num": 3,
+        "action": "Isolate high-consumption payload components if bus voltage drops below threshold.",
+        "expected_response": "Bus voltage recovers to > 28.0V DC.",
+        "caution": "Review science schedule before turning off scientific instrumentation."
+      }
+    ],
+    "document_content": "PROCEDURE PWR-101: Power Load Investigation and Bus Balancing. Subsystem: POWER. Purpose: Identify excessive load draws on main electrical buses. If total power load exceeds 450W or bus voltage drops below 26.5V, examine individual PDU channels. Correlate with solar array drive mechanism orientation and battery discharge rates. Safety constraint: Maintain minimum battery state of charge above 65%."
+  },
+  {
+    "id": "COMM-015",
+    "title": "Communication Anomaly and High Latency Recovery",
+    "subsystem": "COMMUNICATION",
+    "category": "RECOVERY",
+    "description": "Standard diagnostic and recovery procedure for telemetry packet transmission delays, frame loss, transponder signal degradation, and ground station lock failure.",
+    "applicable_conditions": [
+      "Telemetry packet transmission delay exceeds 1.0 second.",
+      "Transponder Signal-to-Noise Ratio (SNR) drops below 12 dB.",
+      "Command reject count increases on primary receiver."
+    ],
+    "safety_constraints": [
+      "Never switch primary transponder to standby without verifying standby RF synthesizer lock.",
+      "Ensure omni-directional antenna remains in receive mode if directional high-gain antenna pointing is suspect."
+    ],
+    "steps": [
+      {
+        "step_num": 1,
+        "action": "Verify ground station elevation angle and atmospheric propagation conditions.",
+        "expected_response": "Ground station elevation > 10 degrees with nominal weather attenuation.",
+        "caution": "Rule out terrestrial ground station equipment issues first."
+      },
+      {
+        "step_num": 2,
+        "action": "Check spacecraft attitude pointing error towards Earth ground station vector.",
+        "expected_response": "High Gain Antenna (HGA) pointing error < 0.5 degrees.",
+        "caution": "If attitude error > 1.0 degree, transfer communication to medium gain antenna (MGA)."
+      },
+      {
+        "step_num": 3,
+        "action": "Examine onboard telemetry buffer queue depth and packet transmission delay.",
+        "expected_response": "Queue depth < 128 packets, delay < 0.3s.",
+        "caution": "High buffer occupancy may indicate low downlink bitrate or carrier loss."
+      }
+    ],
+    "document_content": "PROCEDURE COMM-015: Communication Anomaly and High Latency Recovery. Subsystem: COMMUNICATION. Purpose: Diagnose and recover RF link and packet delays. When packet transmission delay exceeds 1.0s or SNR drops below 12dB, verify antenna pointing error and ground station link margin. Check onboard packet buffer queue. If pointing error > 0.5 deg, coordinate with AOCS team."
+  },
+  {
+    "id": "THERM-003",
+    "title": "Thermal Anomaly and Radiator Loop Investigation",
+    "subsystem": "THERMAL",
+    "category": "INVESTIGATION",
+    "description": "Investigate anomalous thermal gradients across spacecraft radiators, heat pipe heat sinks, battery enclosure, and payload optical bench.",
+    "applicable_conditions": [
+      "Radiator panel temperature deviates > 5°C from orbit average prediction.",
+      "Thermal margin on avionics bay drops below 3°C.",
+      "Heat pipe temperature gradient exceeds 8°C between evaporator and condenser."
+    ],
+    "safety_constraints": [
+      "Keep payload focal plane detector within operating survival limits (-40°C to +45°C).",
+      "Do not execute thermal trim heater reconfigurations during eclipse passage."
+    ],
+    "steps": [
+      {
+        "step_num": 1,
+        "action": "Review multi-point thermistor telemetry across thermal zones 1 through 6.",
+        "expected_response": "All thermistor readings within green limits defined in mission thermal handbook.",
+        "caution": "Identify whether anomaly is localized or spacecraft-wide."
+      },
+      {
+        "step_num": 2,
+        "action": "Correlate thermal anomaly with solar beta angle and attitude orientation.",
+        "expected_response": "Radiator panels in deep space view must not face direct solar impingement.",
+        "caution": "Verify attitude quaternion if radiator is receiving solar illumination."
+      },
+      {
+        "step_num": 3,
+        "action": "Verify operational status of automated heater switches and heat pipe thermal diodes.",
+        "expected_response": "Thermostatic switches operating within deadband thresholds.",
+        "caution": "A stuck-on heater can cause rapid secondary overheating of adjacent subsystems."
+      }
+    ],
+    "document_content": "PROCEDURE THERM-003: Thermal Anomaly and Radiator Loop Investigation. Subsystem: THERMAL. Purpose: Diagnose spacecraft thermal gradients, heat pipe bottlenecks, and radiator anomalies. Correlate thermistor telemetry with sun illumination angles and internal heat generation. Verify heater thermostatic deadbands."
+  },
+  {
+    "id": "FDIR-001",
+    "title": "Autonomous FDIR Warning and Threshold Response",
+    "subsystem": "POWER",
+    "category": "CONTINGENCY",
+    "description": "Response procedure following onboard Flight Fault Detection, Isolation, and Recovery (FDIR) alert generation.",
+    "applicable_conditions": [
+      "FDIR warning flag asserted in mission telemetry or flight software log.",
+      "Autonomously triggered sub-system safe state transition.",
+      "Health monitoring heartbeat timeout detected."
+    ],
+    "safety_constraints": [
+      "Review flight software fault table before overriding any autonomous FDIR trip condition.",
+      "Never clear FDIR alarms without logging corresponding audit trail and root-cause hypothesis."
+    ],
+    "steps": [
+      {
+        "step_num": 1,
+        "action": "Retrieve FDIR fault log snapshot containing error code, timestamp, and triggering parameters.",
+        "expected_response": "Exact parameter ID and threshold value that triggered the fault protection logic.",
+        "caution": "Preserve onboard memory buffer for anomaly review."
+      },
+      {
+        "step_num": 2,
+        "action": "Confirm whether autonomous recovery actions (such as redundant unit switchover) were initiated.",
+        "expected_response": "Autonomous recovery executed successfully or safe mode entered as designed.",
+        "caution": "Do not re-enable failed primary unit until comprehensive analysis is completed."
+      },
+      {
+        "step_num": 3,
+        "action": "Synthesize timeline of events leading up to FDIR assertion (T-15 min to T+5 min).",
+        "expected_response": "Chronological timeline detailing telemetry excursions and error flags.",
+        "caution": "Cross-reference with ground station schedule."
+      }
+    ],
+    "document_content": "PROCEDURE FDIR-001: Autonomous FDIR Warning and Threshold Response. Subsystem: FDIR / POWER. Purpose: Respond to automated spacecraft fault detection alerts. Identify the triggering telemetry parameters, examine flight software fault logs, evaluate autonomous recovery actions taken, and construct chronological timeline before manual intervention."
+  },
+  {
+    "id": "ATT-102",
+    "title": "Attitude Divergence Recovery and Reaction Wheel Desaturation",
+    "subsystem": "ATTITUDE",
+    "category": "RECOVERY",
+    "description": "Procedures to address attitude determination error, reaction wheel speed saturation, gyro drift, and star tracker blinding events.",
+    "applicable_conditions": [
+      "Attitude pointing error exceeds 0.25 degrees.",
+      "Reaction wheel speed exceeds 4500 RPM on any wheel axis.",
+      "Star tracker valid tracking flag drops to false."
+    ],
+    "safety_constraints": [
+      "Ensure solar panels remain pointed within 15 degrees of the sun line during any recovery maneuver.",
+      "Observe magnetorquer torque limits to avoid disturbing sensitive optical instruments."
+    ],
+    "steps": [
+      {
+        "step_num": 1,
+        "action": "Check Star Tracker A and B optical blinding status due to Earth limb or Moon intrusion.",
+        "expected_response": "At least one star tracker unit reporting high-confidence quaternion.",
+        "caution": "Fall back to fine sun sensor and inertial measurement unit (IMU) if both trackers lose lock."
+      },
+      {
+        "step_num": 2,
+        "action": "Inspect reaction wheel momentum vectors across wheels RW-1, RW-2, RW-3, RW-4.",
+        "expected_response": "Wheel speeds below 4000 RPM in steady-state pointing mode.",
+        "caution": "If wheels approach 5000 RPM, initiate magnetic dipole desaturation via magnetorquers."
+      },
+      {
+        "step_num": 3,
+        "action": "Assess drift rate on three-axis fiber optic gyro package.",
+        "expected_response": "Gyro drift rate < 0.01 deg/hr.",
+        "caution": "Recalibrate gyro bias against celestial references once attitude stabilizes."
+      }
+    ],
+    "document_content": "PROCEDURE ATT-102: Attitude Divergence Recovery and Reaction Wheel Desaturation. Subsystem: ATTITUDE. Purpose: Restore spacecraft attitude pointing accuracy. Investigate star tracker valid flags, reaction wheel saturation levels, and gyro drift rates. Perform momentum dump using magnetic torquers when required."
+  }
+]

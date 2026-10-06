@@ -1,0 +1,387 @@
+[
+  {
+    "id": "INC-001",
+    "title": "Solar Array Drive Mechanism Jitter during Sun Tracking",
+    "subsystem": "POWER",
+    "incident_date": "2023-04-12",
+    "description": "Solar array gimbal mechanism encountered motor step skipping during high-rate slew, resulting in 12% drop in array power generation.",
+    "symptoms": [
+      "Current mismatch of 3.4A between wing +Y and wing -Y",
+      "Minor attitude disturbances on roll axis (0.08 deg)"
+    ],
+    "root_cause": "Increased mechanical friction in drive gear bearings due to cold thermal soak following extended eclipse.",
+    "evidence": [
+      "TEL-1102 - Solar array gimbal motor current spike to 2.1A",
+      "LOG-044 - Gimbal drive step slip detected on axis 1"
+    ],
+    "resolution": "Applied supplemental drive motor heater cycle and modified slew step rate profile.",
+    "lessons_learned": "Pre-heat gimbal drive assemblies for 15 minutes prior to egress from eclipse.",
+    "document_content": "INC-001: Solar Array Drive Mechanism Jitter. Subsystem: POWER. Gimbal step skipping caused 12% power dip. Root cause: Gear bearing cold soak. Resolved with heater cycle."
+  },
+  {
+    "id": "INC-002",
+    "title": "Reaction Wheel 3 Bearing Micro-Vibration & Speed Excursion",
+    "subsystem": "ATTITUDE",
+    "incident_date": "2023-06-18",
+    "description": "Reaction wheel RW-3 experienced sudden motor current elevation and acoustic vibrational harmonics affecting fine optical imaging.",
+    "symptoms": [
+      "Wheel speed fluctuated by +/- 150 RPM around setpoint",
+      "Attitude pointing jitter exceeded 0.05 deg on pitch axis"
+    ],
+    "root_cause": "Lubricant redistribution breakdown across high-speed ball bearings after continuous unidirectional operation.",
+    "evidence": [
+      "TEL-2098 - RW-3 current jumped to 1.8A",
+      "LOG-089 - AOCS pointing jitter alarm asserted"
+    ],
+    "resolution": "Commanded wheel speed reversal cycle to redistribute bearing grease reservoir.",
+    "lessons_learned": "Schedule mandatory periodic wheel speed reversal exercises every 45 mission days.",
+    "document_content": "INC-002: Reaction Wheel 3 Bearing Vibration. Subsystem: ATTITUDE. Speed fluctuation and jitter caused by lubricant breakdown. Resolved with wheel reversal exercise."
+  },
+  {
+    "id": "INC-003",
+    "title": "S-Band Transponder Carrier Frequency Drift",
+    "subsystem": "COMMUNICATION",
+    "incident_date": "2023-08-04",
+    "description": "Ground station reported intermittent loss of carrier lock and 4.2 kHz frequency offset on primary S-band downlink channel.",
+    "symptoms": [
+      "Downlink SNR fluctuated between 8.5 dB and 14 dB",
+      "Ground receiver sweep failed on initial pass"
+    ],
+    "root_cause": "Temperature coefficient drift in local oscillator crystal due to degraded thermal blanket insulation.",
+    "evidence": [
+      "TEL-3105 - Transponder baseplate temperature reached 48°C",
+      "LOG-112 - Demodulator lock dropouts on ground station pass"
+    ],
+    "resolution": "Adjusted ground receiver tracking bandwidth and tuned thermal trim heater deadband.",
+    "lessons_learned": "Include oscillator thermal drift calibration table in ground station pass scripts.",
+    "document_content": "INC-003: S-Band Transponder Frequency Drift. Subsystem: COMMUNICATION. Carrier frequency drift caused by oscillator overheating. Resolved by widening ground receiver tracking window and tuning heater."
+  },
+  {
+    "id": "INC-004",
+    "title": "Thermal Radiator Loop Freezing during Prolonged Safe Mode",
+    "subsystem": "THERMAL",
+    "incident_date": "2023-09-22",
+    "description": "During safe mode attitude drift, passive radiator panel faced deep space cold sink for 6 hours, dropping fluid loop below minimum operational limit.",
+    "symptoms": [
+      "Radiator outlet temperature reached -42°C",
+      "Thermal loop flow rate decreased by 40%"
+    ],
+    "root_cause": "Safe mode sun-pointing attitude left radiator permanently shadowed with secondary survival heaters unpowered.",
+    "evidence": [
+      "TEL-4019 - Thermal loop thermistor TH-4 reached -42°C",
+      "LOG-138 - Fluid loop viscous drag warning"
+    ],
+    "resolution": "Autonomous FDIR energized backup survival heater string and biased spacecraft attitude by 10 degrees.",
+    "lessons_learned": "Survival heater auto-assertion must have highest priority in flight software safe mode rules.",
+    "document_content": "INC-004: Thermal Radiator Freezing. Subsystem: THERMAL. Radiator temperature dropped to -42C during safe mode. Root cause: Attitude shadow. Resolved with survival heater activation."
+  },
+  {
+    "id": "INC-005",
+    "title": "Payload Optical Detector Overheating during Calibration Slew",
+    "subsystem": "PAYLOAD",
+    "incident_date": "2023-10-15",
+    "description": "Optical detector focal plane assembly temperature exceeded operational limit during lunar calibration maneuver.",
+    "symptoms": [
+      "Detector temperature rose from -20°C to +18°C in 25 minutes",
+      "Sensor dark current noise degraded image dynamic range"
+    ],
+    "root_cause": "Sun shield baffle grazed solar limb angle during rapid attitude transition.",
+    "evidence": [
+      "TEL-5100 - Focal plane thermistor FP-TEMP reached +18.4°C",
+      "LOG-170 - Payload thermal warning threshold exceeded"
+    ],
+    "resolution": "Aborted calibration slew, commanded spacecraft to anti-sun quarantine attitude, and enabled thermoelectric cooler (TEC).",
+    "lessons_learned": "Enforce automated keep-out sphere constraints in ground mission planning software.",
+    "document_content": "INC-005: Payload Optical Detector Overheating. Subsystem: PAYLOAD. Detector heated during calibration slew due to solar graze. Resolved by returning to anti-sun orientation and TEC boost."
+  },
+  {
+    "id": "INC-006",
+    "title": "Main Bus A Transient Undervoltage on Transmitter Key-Up",
+    "subsystem": "POWER",
+    "incident_date": "2023-11-02",
+    "description": "High-rate X-band scientific transmitter power-on generated a 1.8V bus dip, triggering spurious under-voltage alerts on avionics.",
+    "symptoms": [
+      "Main Bus voltage dropped from 28.1V to 26.3V for 12 milliseconds",
+      "FDIR logged transient bus anomaly"
+    ],
+    "root_cause": "Large inrush current caused by uncharged input filter capacitors on transmitter power supply.",
+    "evidence": [
+      "TEL-1145 - Peak inrush current measured at 24.5A for 15ms",
+      "LOG-195 - Bus voltage transient alarm"
+    ],
+    "resolution": "Implemented soft-start command sequence for transmitter DC-DC converters.",
+    "lessons_learned": "All high-power transmitters must include soft-start inrush current limiters in flight software macro.",
+    "document_content": "INC-006: Main Bus Transient Undervoltage. Subsystem: POWER. Transmitter inrush current caused 1.8V dip. Resolved with soft-start power-up macro."
+  },
+  {
+    "id": "INC-007",
+    "title": "Battery Temperature Increase Associated with Temporary Power-Load Spike",
+    "subsystem": "POWER",
+    "incident_date": "2023-11-14",
+    "description": "Battery pack temperature increased from 28°C to 36.5°C over a 15-minute window following an unexpected payload bus current elevation.",
+    "symptoms": [
+      "Battery current increased from nominal 15.5A to 18.9A",
+      "Battery cell temperature climbed at +0.65°C/min",
+      "FDIR power subsystem advisory triggered"
+    ],
+    "root_cause": "Unexpected secondary payload science heater remained latched in active mode concurrently with X-band downlink transmission.",
+    "evidence": [
+      "TEL-4821 - Battery current measured 18.7A (expected 15-17A)",
+      "TEL-4830 - Battery cell temperature reached 36.5°C",
+      "LOG-220 - Bus current step increase detected",
+      "LOG-223 - Battery thermal threshold warning asserted"
+    ],
+    "resolution": "Ground operations executed load shed of secondary science heater. Battery current dropped to 15.8A and temperature returned to nominal baseline (+27°C) within 25 minutes.",
+    "lessons_learned": "Implement interlock logic in flight software preventing simultaneous science heater activation during high-rate RF transmission.",
+    "document_content": "INC-007: Battery Temperature Increase Associated with Temporary Power-Load Spike. Subsystem: POWER. Symptoms: Battery current rose to 18.9A, temperature reached 36.5C. Root cause: Science heater latched active simultaneously with X-band downlink. Resolution: Load shed executed, load returned to nominal, temperatures stabilized. Lessons learned: Implement heater/transmitter interlocking logic."
+  },
+  {
+    "id": "INC-008",
+    "title": "Star Tracker Optical Stray Light Blindness",
+    "subsystem": "ATTITUDE",
+    "incident_date": "2023-12-05",
+    "description": "Primary star tracker lost celestial tracking lock for 18 minutes while spacecraft traversed high-albedo polar ice sheet reflection.",
+    "symptoms": [
+      "Valid attitude quaternion flag dropped to zero",
+      "IMU gyro propagation error accumulated to 0.18 degrees"
+    ],
+    "root_cause": "Earth limb albedo light entered optical baffle exceeding threshold for star centroid identification algorithms.",
+    "evidence": [
+      "TEL-2201 - Star tracker background noise count rose 300%",
+      "LOG-241 - Star tracker loss of lock event"
+    ],
+    "resolution": "Autonomous AOCS transitioned to redundant Star Tracker B mounted on opposite cant angle.",
+    "lessons_learned": "Update albedo rejection filtering algorithms and baffle glare threshold parameters.",
+    "document_content": "INC-008: Star Tracker Stray Light Blindness. Subsystem: ATTITUDE. Optical blinding from Earth albedo caused loss of lock. Resolved by autonomous switchover to Star Tracker B."
+  },
+  {
+    "id": "INC-009",
+    "title": "X-Band Antenna Gimbal Cable Wrap Harness Tensioning",
+    "subsystem": "COMMUNICATION",
+    "incident_date": "2024-01-20",
+    "description": "High Gain Antenna (HGA) azimuth drive stalled at +185 degrees azimuth during Earth tracking pass.",
+    "symptoms": [
+      "HGA drive motor current spiked to 1.9A limit",
+      "Downlink signal dropped by 18 dB due to pointing misalignment"
+    ],
+    "root_cause": "Thermal contraction of coaxial RF cable harness bundle stiffened flexible loop at low temperatures.",
+    "evidence": [
+      "TEL-3310 - Azimuth drive position stationary at 185.2 deg",
+      "LOG-280 - HGA tracking position deviation alarm"
+    ],
+    "resolution": "Commanded antenna unwrapping slew in reverse direction and activated harness heating patch.",
+    "lessons_learned": "Incorporate azimuth cable wrap unwinding logic before any ground pass that crosses the 180-degree boundary.",
+    "document_content": "INC-009: X-Band Antenna Gimbal Cable Wrap. Subsystem: COMMUNICATION. HGA azimuth drive stalled at +185 deg due to cold cable bundle stiffness. Resolved by reverse slew unwrapping and harness heater."
+  },
+  {
+    "id": "INC-010",
+    "title": "Heat Pipe Non-Condensable Gas Bubble Blockage",
+    "subsystem": "THERMAL",
+    "incident_date": "2024-02-14",
+    "description": "Avionics bay heat pipe thermal conductance degraded by 35%, causing localized hot spot near central processing unit.",
+    "symptoms": [
+      "CPU junction temperature climbed to 68°C under nominal 50% computational load",
+      "Heat pipe condenser end remained colder than expected (18°C)"
+    ],
+    "root_cause": "Accumulation of non-condensable hydrogen gas generated by slow internal chemical reaction at pipe wall.",
+    "evidence": [
+      "TEL-4112 - Thermal gradient across heat pipe reached 22°C (nominal < 5°C)",
+      "LOG-305 - Avionics thermal margin threshold reached"
+    ],
+    "resolution": "Temporary throttling of CPU clock speed from 200 MHz to 100 MHz, followed by thermal soak cycle that drove gas bubble into reservoir slug.",
+    "lessons_learned": "Require high-purity ammonia working fluid verification and titanium-alloy passivation for flight thermal units.",
+    "document_content": "INC-010: Heat Pipe Non-Condensable Gas Bubble. Subsystem: THERMAL. Heat pipe conductance dropped 35%, CPU heated to 68C. Resolved by CPU throttling and thermal soak maneuver."
+  },
+  {
+    "id": "INC-011",
+    "title": "Magnetorquer Polarity Command Inversion",
+    "subsystem": "ATTITUDE",
+    "incident_date": "2024-03-30",
+    "description": "Magnetic momentum unloading sequence resulted in unintended angular momentum buildup instead of desaturation.",
+    "symptoms": [
+      "Reaction wheel RW-1 speed climbed from 3500 RPM to 4800 RPM in 40 minutes",
+      "Attitude control error increased on yaw axis"
+    ],
+    "root_cause": "Sign convention mismatch between ground planning software geomagnetic field model and onboard flight software frame.",
+    "evidence": [
+      "TEL-2405 - Reaction wheel momentum vector accelerating toward upper limit",
+      "LOG-330 - Momentum management error threshold asserted"
+    ],
+    "resolution": "Aborted desaturation sequence, zeroed magnetorquer currents, and uploaded sign correction patch to flight software table.",
+    "lessons_learned": "Enforce automated coordinate system verification testbench in mission planning software releases.",
+    "document_content": "INC-011: Magnetorquer Polarity Command Inversion. Subsystem: ATTITUDE. Desaturation caused momentum buildup due to geomagnetic sign error. Resolved by stopping sequence and patching flight software table."
+  },
+  {
+    "id": "INC-012",
+    "title": "Battery Cell Charge Imbalance during Eclipsing Phase",
+    "subsystem": "POWER",
+    "incident_date": "2024-05-11",
+    "description": "Battery pack cell 4 demonstrated lower open-circuit voltage compared to sibling cells, triggering battery management system warning.",
+    "symptoms": [
+      "Cell 4 voltage was 3.82V while cells 1-3 were 4.10V at end of charge",
+      "Battery effective capacity dropped by 7%"
+    ],
+    "root_cause": "Cell balancing bypass resistor circuit had high contact resistance due to mechanical solder fatigue.",
+    "evidence": [
+      "TEL-1280 - Cell delta voltage exceeded 250mV limit",
+      "LOG-365 - Battery cell imbalance alarm"
+    ],
+    "resolution": "Reconfigured charge regulator to trickle-charge regime and enabled extended passive balancing duration.",
+    "lessons_learned": "Monitor individual cell differential voltages at every charge termination cycle for early trend detection.",
+    "document_content": "INC-012: Battery Cell Charge Imbalance. Subsystem: POWER. Cell 4 delta voltage 250mV due to balancing resistor contact resistance. Resolved by trickle charge and extended passive balancing."
+  },
+  {
+    "id": "INC-013",
+    "title": "Packet Loss Excursion on Downlink Buffer Overflow",
+    "subsystem": "COMMUNICATION",
+    "incident_date": "2024-06-25",
+    "description": "Downlink packet error rate reached 8.2% and telemetry packets were dropped during bulk memory playback dump.",
+    "symptoms": [
+      "Missing frame sequence numbers in ground station ingestion",
+      "Packet transmission delay climbed to 2.4 seconds"
+    ],
+    "root_cause": "Flash memory read DMA controller flooded internal packet multiplexer buffer faster than serializer output rate.",
+    "evidence": [
+      "TEL-3450 - Packet buffer depth reached 100% capacity",
+      "LOG-412 - Telemetry packet drop count incremented by 148 frames"
+    ],
+    "resolution": "Throttled bulk science playback transfer rate and introduced flow control pacing in flight software telemetry engine.",
+    "lessons_learned": "Set hardware flow control rate ceilings 20% below maximum physical link throughput.",
+    "document_content": "INC-013: Packet Loss on Downlink Buffer Overflow. Subsystem: COMMUNICATION. High packet drop rate caused by memory playback DMA burst. Resolved with telemetry pacing throttling."
+  },
+  {
+    "id": "INC-014",
+    "title": "Thermal Louver Blade Jamming in Open Position",
+    "subsystem": "THERMAL",
+    "incident_date": "2024-08-01",
+    "description": "Passive bimetallic thermal louver assembly remained stuck open when spacecraft entered cold orbit phase, chilling battery compartment.",
+    "symptoms": [
+      "Battery pack temperature plunged to +2.5°C (lower operational limit +5°C)",
+      "Battery internal resistance increased by 18%"
+    ],
+    "root_cause": "Micrometeoroid debris particle lodged in blade hinge pivot clearance.",
+    "evidence": [
+      "TEL-4301 - Battery temperature below red limit threshold",
+      "LOG-450 - Low thermal margin alert on battery bay"
+    ],
+    "resolution": "Enabled primary and redundant survival heaters to maintain battery within safe thermal envelope (+15°C).",
+    "lessons_learned": "Install protective debris deflection covers on mechanical thermal louver hinge points.",
+    "document_content": "INC-014: Thermal Louver Jamming Open. Subsystem: THERMAL. Louver stuck open chilled battery to +2.5C. Resolved by engaging survival heater strings."
+  },
+  {
+    "id": "INC-015",
+    "title": "Thruster Valve Cooldown Anomaly following Delta-V Maneuver",
+    "subsystem": "ATTITUDE",
+    "incident_date": "2024-09-17",
+    "description": "Hydrazine reaction control thruster valve temperature failed to cool down after 45-second orbit adjustment burn.",
+    "symptoms": [
+      "Thruster catalyst bed valve body temperature remained at 145°C for 30 minutes",
+      "Slight pressure decay in propellant line manifold"
+    ],
+    "root_cause": "Thermal soakback from catalyst bed chamber through mounting bracket conductively warmed valve seat.",
+    "evidence": [
+      "TEL-2615 - Valve temperature telemetry above nominal post-firing envelope",
+      "LOG-488 - Propulsion thermal soakback advisory"
+    ],
+    "resolution": "Oriented spacecraft to position thruster cluster in deep space shadow, accelerating radiative heat rejection.",
+    "lessons_learned": "Incorporate thermal soakback cooling durations into mission maneuver sequences before closing branch isolation valves.",
+    "document_content": "INC-015: Thruster Valve Cooldown Anomaly. Subsystem: ATTITUDE / PROPULSION. Valve remained hot due to catalyst bed soakback. Resolved with deep-space radiative cooling orientation."
+  },
+  {
+    "id": "INC-016",
+    "title": "Shunt Regulator Unit Thermal Dissipation Saturation",
+    "subsystem": "POWER",
+    "incident_date": "2024-11-09",
+    "description": "Sequential shunt regulator overheated when spacecraft was in high solar irradiance perihelion with minimal payload load.",
+    "symptoms": [
+      "Shunt regulator heat sink temperature rose to 58°C",
+      "Excess power dump capability reduced"
+    ],
+    "root_cause": "Excess solar array generation with all battery strings fully charged and science payloads unpowered.",
+    "evidence": [
+      "TEL-1390 - Shunt stage 3 thermistor in high yellow band",
+      "LOG-522 - Shunt regulator dissipation warning"
+    ],
+    "resolution": "Offset solar array sun-pointing angle by 25 degrees (off-pointing slew) to reduce incident solar power input.",
+    "lessons_learned": "Automate solar array off-pointing algorithms whenever battery state of charge exceeds 98% and payload is idle.",
+    "document_content": "INC-016: Shunt Regulator Thermal Saturation. Subsystem: POWER. Excessive solar generation dumped into shunt regulator caused heating. Resolved by off-pointing solar array wings by 25 degrees."
+  },
+  {
+    "id": "INC-017",
+    "title": "Radio Frequency Interference on Command Uplink Receiver",
+    "subsystem": "COMMUNICATION",
+    "incident_date": "2025-01-14",
+    "description": "Command receiver reported high bit error rate (BER) and dropped uplink frames while operating over European ground station.",
+    "symptoms": [
+      "Uplink frame acceptance dropped from 99.8% to 62%",
+      "Receiver automatic gain control (AGC) indicated high out-of-band power"
+    ],
+    "root_cause": "Terrestrial radar installation operating near 2.0 GHz band generated harmonic intermodulation distortion.",
+    "evidence": [
+      "TEL-3610 - Receiver AGC voltage saturated at 4.2V",
+      "LOG-560 - Command frame CRC checksum errors recorded"
+    ],
+    "resolution": "Switched uplink communication carrier to alternate assigned frequency channel and increased ground EIRP by 3 dB.",
+    "lessons_learned": "Maintain active coordination database of known terrestrial radar transmitters along orbital ground tracks.",
+    "document_content": "INC-017: Command Uplink RF Interference. Subsystem: COMMUNICATION. High BER on uplink due to terrestrial radar intermodulation. Resolved by channel frequency switch."
+  },
+  {
+    "id": "INC-018",
+    "title": "Multi-Layer Insulation (MLI) Blanket Delamination",
+    "subsystem": "THERMAL",
+    "incident_date": "2025-03-29",
+    "description": "Localized MLI foil flap delaminated near propulsion bay during launch ascent or thermal cycling, altering surface emissivity.",
+    "symptoms": [
+      "Propellant tank skin temperature showed higher day/night temperature swings (+/- 14°C)",
+      "Tank heater duty cycle increased by 22%"
+    ],
+    "root_cause": "Acoustic vibration during stage separation degraded hook-and-loop fastener stitching.",
+    "evidence": [
+      "TEL-4450 - Propellant tank temperature diurnal swing exceeded specification",
+      "LOG-601 - Tank heater duty cycle increase logged"
+    ],
+    "resolution": "Re-tuned heater control setpoints to accommodate altered thermal emissivity and maintain propellant above freezing point.",
+    "lessons_learned": "Implement reinforced stitching patterns and metallic clips for MLI outer layers near high-acoustic areas.",
+    "document_content": "INC-018: MLI Blanket Delamination. Subsystem: THERMAL. Damaged insulation increased propellant tank temperature swings. Resolved by re-tuning heater duty cycles."
+  },
+  {
+    "id": "INC-019",
+    "title": "Fiber Optic Gyro Scale Factor Thermal Drift",
+    "subsystem": "ATTITUDE",
+    "incident_date": "2025-06-03",
+    "description": "Inertial measurement unit Z-axis gyro exhibited non-linear drift rate during spacecraft thermal equilibration.",
+    "symptoms": [
+      "Attitude determination residual error grew to 0.35 degrees over 3 orbits",
+      "Reaction wheel rate dampening jitter increased"
+    ],
+    "root_cause": "Thermal gradient across optical coil spool caused differential Sagnac phase shift bias.",
+    "evidence": [
+      "TEL-2720 - IMU Z-axis rate bias diverged from Kalman filter estimate",
+      "LOG-640 - Attitude estimation residual threshold warning"
+    ],
+    "resolution": "Applied polynomial thermal bias correction model to flight software AOCS estimator.",
+    "lessons_learned": "Calibrate optical gyro temperature coefficients across full -20°C to +50°C thermal vacuum spectrum.",
+    "document_content": "INC-019: Fiber Optic Gyro Thermal Drift. Subsystem: ATTITUDE. Optical gyro Z-axis drifted due to spool thermal gradient. Resolved by applying polynomial temperature calibration model."
+  },
+  {
+    "id": "INC-020",
+    "title": "Battery Thermal Runaway Precursor during Fast Charging",
+    "subsystem": "POWER",
+    "incident_date": "2025-09-12",
+    "description": "During high-rate battery recharge following deep eclipse, battery thermal slope accelerated unexpectedly, mimicking thermal runaway precursor.",
+    "symptoms": [
+      "Battery temperature reached 39.1°C with +1.2°C/min slope",
+      "Current was 19.4A at 28.8V terminal voltage",
+      "FDIR warning FDIR-PWR-001 tripped"
+    ],
+    "root_cause": "Combined internal Joule heating and high solar irradiance on adjacent radiator face during fast charge phase.",
+    "evidence": [
+      "TEL-4821 - Current peaked at 19.4A",
+      "TEL-4830 - Temperature spiked to 39.1°C",
+      "LOG-223 - Thermal threshold alarm asserted"
+    ],
+    "resolution": "Autonomous FDIR curtailed charge rate to 8.0A taper mode. Operators subsequently performed load shed of secondary payloads. Temperature stabilized to 29°C within 18 minutes.",
+    "lessons_learned": "Enforce dynamic temperature-dependent charge current limits (C/5 maximum when temp > 33°C).",
+    "document_content": "INC-020: Battery Thermal Runaway Precursor. Subsystem: POWER. Battery current peaked at 19.4A and temp reached 39.1C during fast charge. Autonomous FDIR tapered charge current to 8A and load shed was commanded. Resolved within 18 minutes."
+  }
+]

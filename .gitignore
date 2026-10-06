@@ -1,0 +1,36 @@
+# Python virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest / coverage cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment variables (keep secrets out of git)
+.env
+backend/.env
+
+# Local database files
+*.db
+*.sqlite
+*.sqlite3
+mission_ops.db
+backend/mission_ops.db
+
+# Vector store cache
+data/vector_store/
+backend/data/vector_store/
+chroma_db/
+backend/chroma_db/
+
+# OS generated files
+.DS_Store
+Thumbs.db
